@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useAuthStore } from '../App';
+import { useAuthStore } from '../../store/authStore';
 
 const Navbar = () => {
   const { isLoggedIn, username, logout } = useAuthStore();

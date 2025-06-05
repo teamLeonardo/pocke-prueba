@@ -1,41 +1,30 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { create } from 'zustand';
-import Navbar from './components/Navbar';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import PokemonDetail from './pages/PokemonDetail';
-import MyPokemons from './pages/MyPokemons';
+import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
+import { Suspense } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
+import Navbar from './components/layout/Navbar';
+import PageContainer from './components/layout/PageContainer';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+import { routes } from './routes';
 
-// Definición del store con Zustand
-interface AuthState {
-  isLoggedIn: boolean;
-  username: string;
-  login: (username: string) => void;
-  logout: () => void;
-}
-
-export const useAuthStore = create<AuthState>((set) => ({
-  isLoggedIn: false,
-  username: '',
-  login: (username: string) => set({ isLoggedIn: true, username }),
-  logout: () => set({ isLoggedIn: false, username: '' }),
-}));
+const AppRoutes = () => {
+  const element = useRoutes(routes);
+  return element;
+};
 
 function App() {
   return (
-    <Router>
-      <div className="min-h-screen bg-gray-100">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/pokemon/:id" element={<PokemonDetail />} />
-            <Route path="/my-pokemons" element={<MyPokemons />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <HelmetProvider>
+      <Router>
+        <div className="min-h-screen bg-gray-100">
+          <Navbar />
+          <PageContainer>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AppRoutes />
+            </Suspense>
+          </PageContainer>
+        </div>
+      </Router>
+    </HelmetProvider>
   );
 }
 
