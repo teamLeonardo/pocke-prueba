@@ -20,7 +20,8 @@ pnpm install
 
 2. Crea un archivo `.env`:
 ```env
-VITE_API_URL=https://pokeapi.co/api/v2
+VITE_API_URL='https://pokeapi.co/api/v2'
+VITE_IMAGE_BASE_URL='https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world'
 ```
 
 ## 🚀 Ejecución
