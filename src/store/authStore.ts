@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { usePokemonStore } from './pokemonStore';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -7,9 +9,21 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  isLoggedIn: false,
-  username: '',
-  login: (username: string) => set({ isLoggedIn: true, username }),
-  logout: () => set({ isLoggedIn: false, username: '' }),
-})); 
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      username: '',
+      login: (username: string) => set({ isLoggedIn: true, username }),
+      logout: () => {
+        const { clearPokemonStore } = usePokemonStore.getState();
+        clearPokemonStore();
+        set({ isLoggedIn: false, username: '' });
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
+); 

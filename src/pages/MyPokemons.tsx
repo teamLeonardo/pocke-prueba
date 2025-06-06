@@ -1,72 +1,62 @@
-import { Link } from 'react-router-dom';
-import { useAuthStore } from '../store/authStore';
+import { useEffect, useState } from 'react';
 import { usePokemonStore } from '../store/pokemonStore';
 import PokemonCard from '../components/ui/PokemonCard';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import PageMetadata from '../components/layout/PageMetadata';
 
 const MyPokemons = () => {
-  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-  const { capturedPokemons } = usePokemonStore();
+  const [loading, setLoading] = useState(true);
+  const { capturedPokemons, fetchPokemons } = usePokemonStore();
 
-  if (!isLoggedIn) {
-    return (
-      <>
-        <PageMetadata 
-          title="Acceso Denegado"
-          description="Necesitas iniciar sesión para ver tus Pokémon capturados"
-          keywords={['pokemon', 'acceso', 'login', 'entrenador']}
-        />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Acceso Denegado</h2>
-          <p className="mb-4">Necesitas iniciar sesión para ver tus Pokémon capturados</p>
-          <Link
-            to="/login"
-            className="text-blue-500 hover:text-blue-700 underline"
-          >
-            Iniciar Sesión
-          </Link>
-        </div>
-      </>
-    );
-  }
+  useEffect(() => {
+    const loadPokemons = async () => {
+      try {
+        setLoading(true);
+        await fetchPokemons();
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPokemons();
+  }, [fetchPokemons]);
 
-  if (capturedPokemons.length === 0) {
+  if (loading) {
     return (
-      <>
-        <PageMetadata 
-          title="Mis Pokémon"
-          description="Aún no has capturado ningún Pokémon. ¡Comienza tu aventura!"
-          keywords={['pokemon', 'captura', 'entrenador', 'colección']}
-        />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">No tienes Pokémon capturados</h2>
-          <p className="mb-4">¡Comienza a capturar Pokémon para verlos aquí!</p>
-          <Link
-            to="/"
-            className="text-blue-500 hover:text-blue-700 underline"
-          >
-            Ir a la lista de Pokémon
-          </Link>
-        </div>
-      </>
+      <div className="min-h-[50vh] flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
     );
   }
 
   return (
-    <>
+    <div className="container mx-auto px-4 py-8">
       <PageMetadata 
         title="Mis Pokémon"
-        description={`Tu colección personal de ${capturedPokemons.length} Pokémon capturados`}
-        keywords={['pokemon', 'colección', 'captura', 'entrenador', 'mis pokemon']}
+        description="Gestiona tu colección de Pokémon capturados. Libera o mantén tus Pokémon favoritos."
+        keywords={['pokemon', 'mis pokemon', 'colección', 'capturados', 'pokedex']}
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {capturedPokemons.map((pokemon) => (
-          <Link to={`/pokemon/${pokemon.id}`} key={pokemon.id}>
-            <PokemonCard pokemon={pokemon} showCaptured={true} isCaptured={true} />
-          </Link>
-        ))}
-      </div>
-    </>
+      {capturedPokemons.length === 0 ? (
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+            No tienes Pokémon capturados
+          </h2>
+          <p className="text-gray-600">
+            ¡Comienza tu aventura capturando algunos Pokémon!
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+          {capturedPokemons.map((pokemon) => (
+            <PokemonCard
+              key={pokemon.id}
+              pokemon={pokemon}
+              showCaptured={true}
+              isCaptured={true}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

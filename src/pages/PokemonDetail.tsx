@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { usePokemonStore } from '../store/pokemonStore';
 import { pokemonService } from '../services/pokemonService';
-import type { Pokemon } from '../models/Pokemon';
+import type { Pokemon } from '../types/pokemon';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import PageContainer from '../components/layout/PageContainer';
 import PageMetadata from '../components/layout/PageMetadata';
@@ -41,6 +41,8 @@ const PokemonDetail = () => {
           id: pokemon.id,
           name: pokemon.name,
           image: pokemon.image,
+          types: pokemon.types,
+          abilities: pokemon.abilities,
         });
       }
     }
@@ -67,8 +69,8 @@ const PokemonDetail = () => {
   }
 
   const isPokemonCaptured = isCaptured(pokemon.id);
-  const types = pokemon.types?.map((t) => t.type.name) || [];
-  const abilities = pokemon.abilities?.map((a) => a.ability.name) || [];
+  const types = pokemon.types || [];
+  const abilities = pokemon.abilities || [];
   const description = `Descubre todo sobre ${pokemon.name}. Altura: ${pokemon.height}, Peso: ${pokemon.weight}. ${types.join(', ')}`;
 
   return (
@@ -80,7 +82,7 @@ const PokemonDetail = () => {
         image={pokemon.sprites?.front_default}
       />
       <PageContainer>
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto pt-8">
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="md:flex">
               <div className="md:w-1/2 p-8">
@@ -120,10 +122,6 @@ const PokemonDetail = () => {
                         </span>
                       ))}
                     </div>
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-semibold mb-2">Experiencia Base</h2>
-                    <p className="text-gray-600">{pokemon.base_experience}</p>
                   </div>
                   {isLoggedIn && (
                     <button

@@ -1,31 +1,23 @@
-import { BrowserRouter as Router, useRoutes } from 'react-router-dom';
 import { Suspense } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
-import Navbar from './components/layout/Navbar';
-import PageContainer from './components/layout/PageContainer';
-import LoadingSpinner from './components/ui/LoadingSpinner';
+import { useRoutes } from 'react-router-dom';
 import { routes } from './routes';
+import Navbar from './components/layout/Navbar';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+import PageContainer from './components/layout/PageContainer';
 
-const AppRoutes = () => {
+const App = () => {
   const element = useRoutes(routes);
-  return element;
-};
 
-function App() {
   return (
-    <HelmetProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-100">
-          <Navbar />
-          <PageContainer>
-            <Suspense fallback={<LoadingSpinner />}>
-              <AppRoutes />
-            </Suspense>
-          </PageContainer>
-        </div>
-      </Router>
-    </HelmetProvider>
+    <div className="min-h-screen bg-gray-100">
+      <Navbar />
+      <PageContainer>
+        <Suspense fallback={<LoadingSpinner />}>
+          {element}
+        </Suspense>
+      </PageContainer>
+    </div>
   );
-}
+};
 
 export default App;
